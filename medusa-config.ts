@@ -4,7 +4,8 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 module.exports = defineConfig({
 	projectConfig: {
-		databaseLogging: true,
+		redisUrl: process.env.REDIS_URL || "redis://heulastore_redis:6379",
+		databaseLogging: false,
 		databaseUrl: process.env.DATABASE_URL,
 		http: {
 			storeCors: process.env.STORE_CORS!,
@@ -13,6 +14,9 @@ module.exports = defineConfig({
 			jwtSecret: process.env.JWT_SECRET || 'supersecret',
 			cookieSecret: process.env.COOKIE_SECRET || 'supersecret',
 		},
+	},
+	admin: {
+		backendUrl: process.env.MEDUSA_BACKEND_URL,
 	},
 	modules: [
 		{
@@ -26,6 +30,26 @@ module.exports = defineConfig({
 		},
 		{
 			resolve: './src/modules/hello',
+		},
+		{
+			resolve: "@medusajs/medusa/cache-redis",
+			options: {
+				redisUrl: process.env.REDIS_URL,
+			},
+		},
+		{
+			resolve: "@medusajs/medusa/event-bus-redis",
+			options: {
+				redisUrl: process.env.REDIS_URL,
+			},
+		},
+		{
+			resolve: "@medusajs/medusa/workflow-engine-redis",
+			options: {
+				redis: {
+					url: process.env.REDIS_URL,
+				},
+			},
 		},
 	],
 });
